@@ -6,27 +6,27 @@
 # The reason is that users may have different cuda versions
 
 # http related
-pip install --upgrade requests==2.22.0
+pip install --upgrade requests
 
 # OpenCV
-pip install --upgrade opencv-python==4.1.1.26
-pip install --upgrade opencv-contrib-python==4.1.1.26
+pip install --upgrade opencv-python
+pip install --upgrade opencv-contrib-python
 
 # For plotting images
-pip install --upgrade matplotlib==3.1.1
+pip install --upgrade matplotlib
 
 # For machine learning
-pip install --upgrade scikit-learn==0.21.3
+pip install --upgrade scikit-learn
 
 # For TensorBoard
-pip install --upgrade tb-nightly==2.1.0a20191103
-pip install --upgrade tensorflow==2.0.0
-pip install --upgrade future==0.18.2
-pip install --upgrade moviepy==1.0.1
+pip install --upgrade tb-nightly
+pip install --upgrade tensorflow
+pip install --upgrade future
+pip install --upgrade moviepy
 
 # For data analysis
-pip install --upgrade pandas==0.25.3
+pip install --upgrade pandas
 
 # For pytorch related
-pip install --upgrade torchviz==0.0.1
-pip install --upgrade torchsummary==1.5.1
+pip install --upgrade torchviz
+pip install --upgrade torchsummary

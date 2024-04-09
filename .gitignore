@@ -17,3 +17,4 @@ schema.sql
 !**/data/production_url_list/
 back-end/www/**/*.pt
 back-end/www/**/*.pkl
+env.yml
