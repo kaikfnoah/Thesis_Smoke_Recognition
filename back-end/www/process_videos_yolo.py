@@ -68,9 +68,6 @@ def extract_frames(video_path, output_dir, filename, num_frames=32):
             unique_filename = str(uuid.uuid4()) + ".jpg"
             output_path = os.path.join(output_dir, unique_filename)
 
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
-
             # Save the frame to disk
             cv.imwrite(output_path, frame)
 
@@ -102,10 +99,12 @@ def compute_and_save_flow(video_data, type):
     if not is_file_here(vid_dir):
         return
 
+    # Check if the output dir exists and create if not
+    check_and_create_dir(out_dir)
+
     # Extract frames from the video file
     num_frames = 36
     extract_frames(vid_dir, out_dir, num_frames)
-    # print(f'Process video {file_name}')
 
 
 if __name__ == "__main__":
