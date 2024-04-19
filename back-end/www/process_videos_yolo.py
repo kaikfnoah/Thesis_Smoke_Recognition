@@ -2,7 +2,7 @@ import os
 import sys
 from util import *
 import numpy as np
-from optical_flow.optical_flow import OpticalFlow
+import cv2
 from multiprocessing import Pool
 
 thread = "1"
@@ -83,6 +83,32 @@ def extract_frames(video_path, output_dir, filename, num_frames=32):
     # Return the total number of frames extracted
     return count
 
+def preprocess_video_to_image_grid_version(video_path, output_path, num_rows=6, num_cols=6):
+    # Open the video file
+    video = cv2.VideoCapture(video_path)
+    frames = []
+    if not video.isOpened():
+        print("Error: Could not open video file")
+    else:
+        while True:
+            ret, frame = video.read()
+            if not ret:
+                break
+            frames.append(frame)
+        video.release()
+    
+    # Split frames into grid
+    grid = []
+    for i in range(num_rows):
+        row = np.concatenate(frames[i * num_cols: (i + 1) * num_cols], axis=1)
+        grid.append(row)
+    
+    # Concatenate grid vertically to create a single image
+    concatenated_frame = np.concatenate(grid, axis=0)
+    
+    # Save the image
+    cv.imwrite(output_path, concatenated_frame)
+
 
 def compute_and_save_flow(video_data, type):
     video_dir = "../data/videos/"
@@ -103,8 +129,8 @@ def compute_and_save_flow(video_data, type):
     check_and_create_dir(out_dir)
 
     # Extract frames from the video file
-    num_frames = 36
-    extract_frames(vid_dir, out_dir, num_frames)
+    out_path = str(out_dir + file_name + '.jpg')
+    preprocess_video_to_image_grid_version(vid_dir, out_path, num_rows=6, num_cols=6)
 
 
 if __name__ == "__main__":
