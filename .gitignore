@@ -18,3 +18,5 @@ schema.sql
 back-end/www/**/*.pt
 back-end/www/**/*.pkl
 env.yml
+runs/
+jobs/
