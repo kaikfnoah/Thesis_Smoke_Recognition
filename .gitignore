@@ -21,3 +21,4 @@ env.yml
 runs/
 jobs/
 dl2023_gpu.yml
+slurm_outputs/
