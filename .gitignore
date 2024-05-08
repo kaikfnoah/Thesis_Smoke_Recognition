@@ -21,3 +21,5 @@ env.yml
 runs/
 yolo_data
 frames_ijmond
+jobs/
+dl2023_gpu.yml
