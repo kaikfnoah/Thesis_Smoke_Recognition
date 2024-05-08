@@ -16,7 +16,7 @@ def split_and_save_data(vm, target_key_type, method="assign", no_link=False):
             if "url_root" in v: del v["url_root"]
         vm_dict[k].append(v)
 
-    p = "../data/split_ijmond/"
+    p = "../data/ijmond/split_ijmond/"
     check_and_create_dir(p)
     print("="*40)
     print("="*40)
@@ -217,7 +217,7 @@ def main(argv):
         print("Must confirm by running: python split_metadata.py confirm")
         return
 
-    vm = load_json("../data/metadata_ijmond_jan_22_2024_original.json")
+    vm = load_json("../data/ijmond/metadata_ijmond_jan_22_2024_original.json")
     vm = aggregate_label(vm)
     method = "assign"
     no_link = True
