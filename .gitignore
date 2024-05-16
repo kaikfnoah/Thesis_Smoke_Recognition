@@ -23,3 +23,8 @@ yolo_data
 frames_ijmond
 jobs/
 dl2023_gpu.yml
+test_annotations/
+datasets/
+SAM/
+yolo_OSL/
+YOLOv8/
