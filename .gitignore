@@ -28,3 +28,4 @@ datasets/
 SAM/
 yolo_OSL/
 YOLOv8/
+slurm_outputs/
