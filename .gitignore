@@ -21,6 +21,11 @@ env.yml
 runs/
 jobs/
 dl2023_gpu.yml
+test_annotations/
+datasets/
+SAM/
+yolo_OSL/
+YOLOv8/
 slurm_outputs/
 datasets/
 yolo_OSL/
