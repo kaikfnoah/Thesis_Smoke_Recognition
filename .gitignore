@@ -19,8 +19,9 @@ back-end/www/**/*.pt
 back-end/www/**/*.pkl
 env.yml
 runs/
-yolo_data
-frames_ijmond
 jobs/
 dl2023_gpu.yml
 slurm_outputs/
+datasets/
+yolo_OSL/
+YOLOv8/data/annotated_data
