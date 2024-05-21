@@ -24,7 +24,7 @@ except ImportError:
 import numpy as np
 import numbers
 import types
-import collections
+import collections.abc as collections
 import warnings
 
 _cv2_pad_to_str = {'constant':cv2.BORDER_CONSTANT,
