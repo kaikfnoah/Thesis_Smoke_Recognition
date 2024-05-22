@@ -16,8 +16,8 @@ cv.setNumThreads(12)
 # Process videos into rgb frame files and optical flow files
 # The file format is numpy.array
 def main():
-    rgb_dir = "back-end/data/ijmond/rgb_ijmond/"
-    metadata_path = "back-end/data/ijmond/metadata_ijmond_jan_22_2024_original.json"
+    rgb_dir = "../data/ijmond/rgb_ijmond/"
+    metadata_path = "../data/ijmond/metadata.json"
     num_workers = 1
 
     # Check for saving directories and create if they don't exist
@@ -30,8 +30,8 @@ def main():
 
 
 def compute_and_save_flow(video_data):
-    video_dir = "back-end/data/ijmond/videos_ijmond/"
-    rgb_dir = "back-end/data/ijmond/rgb_ijmond/"
+    video_dir = "../data/ijmond/videos_ijmond/"
+    rgb_dir = "../data/ijmond/rgb_ijmond/"
 
     file_name = video_data["file_name"]
     rgb_vid_in_p = str(video_dir + file_name + ".mp4")
