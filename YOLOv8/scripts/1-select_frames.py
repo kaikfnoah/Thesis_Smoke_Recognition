@@ -92,11 +92,3 @@ def main(argvs):
 
 if __name__ == "__main__":
     main(sys.argv)
-
-# model = YOLO('runs/segment/train6/weights/best.pt')
-# results = model('/projects/0/prjs1005/datasets/frames_seg_steam/wMCR-f4pFVI-1.jpg')
-
-# print(results[0].boxes.conf)
-# print(results[0].boxes.cls)
-
-# results[0].save(filename='resulting_imgs/wMCR-f4pFVI-1.jpg')

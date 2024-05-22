@@ -25,8 +25,7 @@ test_annotations/
 datasets/
 SAM/
 yolo_OSL/
-YOLOv8/
 slurm_outputs/
 datasets/
 yolo_OSL/
-YOLOv8/data/annotated_data
+YOLOv8/data/
