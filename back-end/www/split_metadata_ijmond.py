@@ -217,7 +217,7 @@ def main(argv):
         print("Must confirm by running: python split_metadata.py confirm")
         return
 
-    vm = load_json("../data/ijmond/metadata_ijmond_jan_22_2024_original.json")
+    vm = load_json("../data/metadata_ijmond_jan_22_2024_original.json")
     vm = aggregate_label(vm)
     method = "assign"
     no_link = True

@@ -19,14 +19,14 @@ back-end/www/**/*.pt
 back-end/www/**/*.pkl
 env.yml
 runs/
-yolo_data
-frames_ijmond
 jobs/
 dl2023_gpu.yml
 test_annotations/
 datasets/
 SAM/
 yolo_OSL/
-YOLOv8/
 slurm_outputs/
 frames_rise
+datasets/
+yolo_OSL/
+YOLOv8/data/
