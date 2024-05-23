@@ -2,8 +2,16 @@ import sys
 from ultralytics import YOLO
 
 def main(argv):
+    if len(argv) < 2:
+        print("Usage: python 0-select_frames.py [ijmond/rise]")
+        return
+    name = argv[1]
+    if name not in ('ijmond', 'rise'):
+        print("Usage: python 0-select_frames.py [ijmond/rise]")
+        return
+    
     model_path = '../data/pre_trained_models/yolov8x.pt'
-    data_path = '../data/rise/annotated/data.yaml'
+    data_path = f'../data/{name}/annotated/data.yaml'
     
     model = YOLO(model_path)
     model.train(data=data_path,
