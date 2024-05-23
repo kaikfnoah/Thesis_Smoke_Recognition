@@ -18,14 +18,8 @@ schema.sql
 back-end/www/**/*.pt
 back-end/www/**/*.pkl
 env.yml
-runs/
 jobs/
 dl2023_gpu.yml
-test_annotations/
-datasets/
-SAM/
-yolo_OSL/
-slurm_outputs/
 datasets/
 yolo_OSL/
-YOLOv8/data/
+YOLOv8/scripts/runs
