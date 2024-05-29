@@ -8,7 +8,7 @@ import numpy as np
 from ultralytics import YOLO
 
 
-def conf_score_frame(model, frame):
+def conf_score_frame(model, frame):    
     results = model(frame, verbose=False)
     
     classes = results[0].boxes.cls
@@ -19,6 +19,24 @@ def conf_score_frame(model, frame):
         return max(results[0].boxes.conf[pos_positions])
     else:
         return 0
+    
+    # results = model(frame, verbose=False)
+    
+    # classes = results[0].boxes.cls
+    # smoke_pos = torch.where(classes == 0)[0]
+    # if len(smoke_pos) == 0:
+    #     return 0
+    # else:
+    #     total_area = 0
+    #     masks = results[0].masks[smoke_pos]
+    #     for mask in masks:
+    #         # Convert mask to a numpy array
+    #         mask_array = mask.data.cpu().numpy() if hasattr(mask, 'numpy') else mask
+            
+    #         # Calculate the number of non-zero pixels (i.e., the area of the segmentation)
+    #         area = np.sum(mask_array)
+    #         total_area += area
+    #     return total_area
 
 
 def main(argvs):
@@ -30,7 +48,7 @@ def main(argvs):
         print("Usage: python 1-select_frames.py [ijmond/rise]")
         return
     
-    model_path = '../runs/segment/train6/weights/best.pt'
+    model_path = f'../data/saved_models/detection_{name}_2.pt'
     model = YOLO(model_path)
     
     # All video file names
@@ -38,7 +56,7 @@ def main(argvs):
     all_video_filenames = np.array(os.listdir(video_dir))
     
     # Videos with smoke
-    metadata_dir = f'../data/{name}/metadata'
+    metadata_dir = f'../data/{name}/splits'
     pos_video_filenames = []
     for file in os.listdir(os.fsencode(metadata_dir)):
         filename = os.fsdecode(file)
@@ -57,6 +75,8 @@ def main(argvs):
     
     # Loop through all IJmond videos
     print("#################### STARTING VIDEO FRAME SELECION ####################")
+    print(f"Using model: {model_path}")
+    
     no_pos_detection = []
     for filename in all_video_filenames:
         file_path = os.path.join(video_dir, filename)
@@ -65,27 +85,31 @@ def main(argvs):
         # Check pos or neg
         success, frame = vidcap.read()
         if filename in pos_video_filenames:
-            best_conf = 0
+            largest_area, count = 0, 1
             best_frame = frame
             while success:
-                conf = conf_score_frame(model=model, frame=frame)
+                area = conf_score_frame(model=model, frame=frame)
                 
-                if conf > best_conf:
+                if area > largest_area:
                     best_frame = frame
-                    best_conf = conf
+                    largest_area = area
+                if count // 2 == 18:
+                    middle_frame = frame
                 success, frame = vidcap.read()
+                count += 1
             
             # Chech if there are images (in positive dir) without smoke detection
-            if best_conf == 0:
+            if largest_area == 0:
                 no_pos_detection.append(filename)
+                cv2.imwrite(f"../data/{name}/frames/{filename[:-4]}.jpg", middle_frame)
             else:
                 cv2.imwrite(f"../data/{name}/frames/{filename[:-4]}.jpg", best_frame)  
-                print(f'Finished POSITIVE video {filename}')
+            print(f'Finished POSITIVE video {filename}')
         else:
             # Select the first frame
             cv2.imwrite(f"../data/{name}/frames/{filename[:-4]}.jpg", frame)  
             print(f'Finished NEGATIVE video {filename}')
-        
+            
         vidcap.release()
     print(f"There are {len(no_pos_detection)} videos in which no smoke was detected (while there should have been).")
     print(no_pos_detection)

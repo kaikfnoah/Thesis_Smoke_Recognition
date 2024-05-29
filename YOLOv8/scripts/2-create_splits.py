@@ -1,5 +1,6 @@
 import os
 import cv2
+import sys
 import json
 
 def create_yolo_struture(data, type, name, YOLO_DIR):
@@ -31,9 +32,9 @@ def create_yolo_struture(data, type, name, YOLO_DIR):
                 cv2.imwrite(SAVE_PATH, img)
 
 
-def main():
-    name = 'ijmond'
-    SPLITS_DIR = f'../data/{name}/splits'
+def main(argvs):
+    name = argvs[1]
+    SPLITS_DIR = f'../data/{name}/splits_yolo'
     
     if not os.path.exists(SPLITS_DIR):
         os.mkdir(SPLITS_DIR)
@@ -49,7 +50,7 @@ def main():
         for type in ('train', 'test', 'validation'):
         
             # Load data
-            with open(f'../data/{name}/metadata/metadata_{type}_split_{split}.json') as f:
+            with open(f'../data/{name}/splits/metadata_{type}_split_{split}.json') as f:
                 data = json.load(f)
             
             # Run yolo data structure creation
@@ -57,4 +58,4 @@ def main():
             
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
