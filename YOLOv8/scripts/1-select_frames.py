@@ -19,24 +19,6 @@ def conf_score_frame(model, frame):
         return max(results[0].boxes.conf[pos_positions])
     else:
         return 0
-    
-    # results = model(frame, verbose=False)
-    
-    # classes = results[0].boxes.cls
-    # smoke_pos = torch.where(classes == 0)[0]
-    # if len(smoke_pos) == 0:
-    #     return 0
-    # else:
-    #     total_area = 0
-    #     masks = results[0].masks[smoke_pos]
-    #     for mask in masks:
-    #         # Convert mask to a numpy array
-    #         mask_array = mask.data.cpu().numpy() if hasattr(mask, 'numpy') else mask
-            
-    #         # Calculate the number of non-zero pixels (i.e., the area of the segmentation)
-    #         area = np.sum(mask_array)
-    #         total_area += area
-    #     return total_area
 
 
 def main(argvs):
@@ -48,7 +30,7 @@ def main(argvs):
         print("Usage: python 1-select_frames.py [ijmond/rise]")
         return
     
-    model_path = f'../data/saved_models/detection_{name}_2.pt'
+    model_path = f'../data/saved_models/detection_{name}.pt'
     model = YOLO(model_path)
     
     # All video file names

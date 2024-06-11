@@ -48,9 +48,9 @@ class I3dLearner(BaseLearner):
             batch_size_train=10, # size for each batch for training
             batch_size_test=50, # size for each batch for testing
             batch_size_extract_features=40, # size for each batch for extracting features
-            max_steps=2000, # total number of steps for training
+            max_steps=30, # total number of steps for training
             num_steps_per_update=2, # gradient accumulation (for large batch size that does not fit into memory)
-            init_lr=0.1, # initial learning rate
+            init_lr=0.05, # initial learning rate
             weight_decay=0.000001, # L2 regularization
             momentum=0.9, # SGD parameters
             milestones=[500, 1500], # MultiStepLR parameters
@@ -61,7 +61,7 @@ class I3dLearner(BaseLearner):
             augment=True, # use data augmentation or not
             num_workers=12, # number of workers for the dataloader
             mode="rgb", # can be "rgb" or "flow" or "rgbd"
-            p_frame="../data/rgb/", # path to load video frames
+            p_frame="../data/ijmond/rgb_ijmond/", # path to load video frames
             code_testing=False # a special flag for testing if the code works
             ):
         super().__init__(use_cuda=use_cuda)
@@ -279,9 +279,9 @@ class I3dLearner(BaseLearner):
     def fit(self,
             p_model=None, # the path to load the pretrained or previously self-trained model
             model_id_suffix="", # the suffix appended after the model id
-            p_metadata_train="../data/split/metadata_train_split_0_by_camera.json", # metadata path (train)
-            p_metadata_validation="../data/split/metadata_validation_split_0_by_camera.json", # metadata path (validation)
-            p_metadata_test="../data/split/metadata_test_split_0_by_camera.json", # metadata path (test)
+            p_metadata_train="../data/ijmond/splits/metadata_train_split_0_by_camera.json", # metadata path (train)
+            p_metadata_validation="../data/ijmond/splits/metadata_validation_split_0_by_camera.json", # metadata path (validation)
+            p_metadata_test="../data/ijmond/splits/metadata_test_split_0_by_camera.json", # metadata path (test)
             save_model_path="../data/saved_i3d/[model_id]/model/", # path to save the models ([model_id] will be replaced)
             save_tensorboard_path="../data/saved_i3d/[model_id]/run/", # path to save data ([model_id] will be replaced)
             save_log_path="../data/saved_i3d/[model_id]/log/train.log", # path to save log files ([model_id] will be replaced)
@@ -303,7 +303,8 @@ class I3dLearner(BaseLearner):
 
         # Spawn processes
         n_gpu = torch.cuda.device_count()
-        if self.parallel and n_gpu > 1:
+        # if self.parallel and n_gpu > 1:
+        if False:
             self.can_parallel = True
             self.log("Let's use " + str(n_gpu) + " GPUs!")
             mp.spawn(self.fit_worker, nprocs=n_gpu,
@@ -415,7 +416,7 @@ class I3dLearner(BaseLearner):
                     # Accumulate gradients during training
                     if (accum[phase] == nspu) and phase == "train":
                         steps += 1
-                        if steps % nspc == 0:
+                        if steps == 30:
                             # Log learning rate and loss
                             lr = lr_sche.get_lr()[0]
                             tll = tot_loc_loss[phase]/nspu_nspc
@@ -491,11 +492,7 @@ class I3dLearner(BaseLearner):
     def test(self,
             p_model=None # the path to load the pretrained or previously self-trained model
             ):
-        # Check
-        if p_model is None or not is_file_here(p_model):
-            self.log("Need to provide a valid model path")
-            return
-
+        
         # Set path
         match = re.search(r'\b/[0-9a-fA-F]{7}-i3d-(rgb|flow)[^/]*/\b', p_model)
         model_id = match.group()[1:-1]
@@ -504,8 +501,14 @@ class I3dLearner(BaseLearner):
             return
         p_root = p_model[:match.start()] + "/" + model_id + "/"
         p_metadata_test = p_root + "metadata/metadata_test.json" # metadata path (test)
+        
+        # p_root = p_model[:32]
+        # p_metadata_test = p_root + "metadata/combined.json" # metadata path (test)
         save_log_path = p_root + "log/test.log" # path to save log files
         save_viz_path = p_root + "viz/" # path to save visualizations
+        
+        # if not os.path.exists(p_root + 'log'):
+        #     os.mkdir(p_root + 'log')
 
         # Spawn processes
         n_gpu = torch.cuda.device_count()
@@ -612,10 +615,10 @@ class I3dLearner(BaseLearner):
 
     def extract_features(self,
             p_model=None, # the path to load the pretrained or previously self-trained model
-            p_feat="../data/i3d_features_rgb/", # path to save features
-            p_metadata_train="../data/split/metadata_train_split_0_by_camera.json", # metadata path (train)
-            p_metadata_validation="../data/split/metadata_validation_split_0_by_camera.json", # metadata path (validation)
-            p_metadata_test="../data/split/metadata_test_split_0_by_camera.json", # metadata path (test)
+            p_feat="../data/ijmond/rgb_ijmond/", # path to save features
+            p_metadata_train="../data/ijmond/splits/metadata_train_split_0_by_camera.json", # metadata path (train)
+            p_metadata_validation="../data/ijmond/splits/metadata_validation_split_0_by_camera.json", # metadata path (validation)
+            p_metadata_test="../data/ijmond/splits/metadata_test_split_0_by_camera.json", # metadata path (test)
             ):
         # Set path
         check_and_create_dir(p_feat) # check the directory for saving features

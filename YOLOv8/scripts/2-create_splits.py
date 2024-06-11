@@ -1,7 +1,7 @@
 import os
-import cv2
 import sys
 import json
+import shutil
 
 def create_yolo_struture(data, type, name, YOLO_DIR):
     if type == 'validation':
@@ -20,19 +20,25 @@ def create_yolo_struture(data, type, name, YOLO_DIR):
             
     for row in data:
         file_name = row['file_name']
-        img = cv2.imread(f'../data/{name}/frames/' + file_name + '.jpg')
-        
-        # This has to be fixed, because not scientifically sound
-        if img is not None:
-            if row['label'] == 0:
-                SAVE_PATH = os.path.join(SPLIT_DIR, 'negative/') + file_name + '.jpg'
-                cv2.imwrite(SAVE_PATH, img)
-            else:
-                SAVE_PATH = os.path.join(SPLIT_DIR, 'positive/') + file_name + '.jpg'
-                cv2.imwrite(SAVE_PATH, img)
+        source_file = f'../data/{name}/frames/' + file_name + '.jpg'
+
+        if row['label'] == 0:
+            SAVE_PATH = os.path.join(SPLIT_DIR, 'negative/') + file_name + '.jpg'
+            shutil.copy(source_file, SAVE_PATH)
+        else:
+            SAVE_PATH = os.path.join(SPLIT_DIR, 'positive/') + file_name + '.jpg'
+            shutil.copy(source_file, SAVE_PATH)
 
 
 def main(argvs):
+    if len(argvs) < 2:
+        print("Usage: python 2-create_splits.py [ijmond/rise]")
+        return
+    name = argvs[1]
+    if name not in ('ijmond', 'rise'):
+        print("Usage: python 2-create_splits.py [ijmond/rise]")
+        return
+    
     name = argvs[1]
     SPLITS_DIR = f'../data/{name}/splits_yolo'
     
@@ -43,6 +49,7 @@ def main(argvs):
 
     for split in SPLITS:
         
+        print(f'######### CREATING SPLIT {split}')
         YOLO_DIR = os.path.join(SPLITS_DIR, split)
         if not os.path.exists(YOLO_DIR):
             os.mkdir(YOLO_DIR)
@@ -55,6 +62,7 @@ def main(argvs):
             
             # Run yolo data structure creation
             create_yolo_struture(data, type, name, YOLO_DIR)
+            print(f'#### FINISHED {type}')
             
 
 if __name__ == "__main__":
