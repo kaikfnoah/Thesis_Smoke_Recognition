@@ -3,8 +3,10 @@ import sys
 import json
 import shutil
 import random
+import numpy as np
 
 from ultralytics import YOLO
+from sklearn.metrics import f1_score, precision_score, recall_score
 
 GOLD_NEG = ['TUZbSqcLVtU-1', 'wg6C4QySFD4-2', 'Dj2I-b0zTWU-1', '5IUJvUa_eso-1', 'zgTCcwKiEXQ-2', 'S0pXH97m558-2', 
             'ILO3p3GdlQg-0', 'rPBe7y54Yxs-1', 'whmQf-ud0RY-2', 'Ajsd1Q08DmA-0', 'S0pXH97m558-0', 'zuX9sR4wYKc-0', 
@@ -119,131 +121,166 @@ def train_models(n_shot):
     dir_path = '../data/saved_models/0-shot'
     data_path = f'../data/ijmond/n-shot/{n_shot}'
 
-    for m in os.listdir(dir_path):
-        model_path = dir_path + '/' + m
-        model = YOLO(model_path)
-        
-        model.train(data=data_path,
-                    batch=-1,
-                    epochs=30,
-                    seed=0,
-                    verbose=False)
+    # Enter what model you want to run n-shot with
+    model_path = dir_path + '/S0.pt'
+    model = YOLO(model_path)
+    
+    model.train(data=data_path,
+                batch=-1,
+                epochs=20,
+                imgsz=640,
+                seed=0,
+                single_cls=True,
+                verbose=True)
 
 
-def save_best_model(n_shot, best_model_path, n_config):
+def save_model(n_shot, model_path, n_config):
     dir_path = f'../data/saved_models/{n_shot}'
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
     
+    # Save to folder
     SAVE_PATH = f'../data/saved_models/{n_shot}/best.pt'
-    shutil.copy(best_model_path, SAVE_PATH)
+    shutil.copy(model_path, SAVE_PATH)
     
     # Rename 
     os.rename(f'../data/saved_models/{n_shot}/best.pt',
               f'../data/saved_models/{n_shot}/{n_config}.pt')
-
-
-def test_models(n_shot, n_config):
-    dir_path = 'runs/classify'    
-    best_f1, best_p, best_r = 0, 0, 0
-    avg_f1, avg_p, avg_r = 0, 0, 0
     
-    best_model = ''
-
-    for fldr in os.listdir(dir_path):
-        model_path = os.path.join(dir_path, fldr) + '/weights/best.pt'
+    
+def test_models(n_shot, n_config=None):
+    if n_shot != '0-shot':
+        model_path = 'runs/classify/train/weights/best.pt'
         model = YOLO(model_path)
         
-        tp, tn, fp, fn = 0, 0, 0, 0
+        y_true, y_pred = np.array([]), np.array([])
         for type in ('positive', 'negative'):
+
             results = model(f'../data/ijmond/n-shot/{n_shot}/test/{type}/', verbose=False)
-
             for result in results:
-                y_pred = result.probs.top1
-                if type == 'positive' and y_pred == 1:
-                    tp += 1
-                elif type == 'positive' and y_pred == 0:
-                    fn += 1
-                elif type == 'negative' and y_pred == 1:
-                    fp += 1
+                
+                if type == 'positive':
+                    y_true = np.append(y_true, 1)
                 else:
-                    tn += 1
-        try:
-            p = tp / (tp + fp)
-        except ZeroDivisionError:
-            p = 0
-        try:
-            r = tp / (tp + fn)
-        except ZeroDivisionError:
-            r = 0
-        try:
-            f1 = 2 * ((p * r) / (p + r))
-        except ZeroDivisionError:
-            f1 = 0
-            
-        if f1 > best_f1:
-            best_f1 = f1
-            best_p = p
-            best_r = r
-            best_model = model_path
+                    y_true = np.append(y_true, 0)
+                y_pred = np.append(y_pred, result.probs.top1)
         
-        avg_p += p
-        avg_r += r
-        avg_f1 += f1
+        # Save model
+        save_model(n_shot, model_path, n_config)
+        
+        print('##################################')
+        print(f'Precision: {precision_score(y_true, y_pred, average="weighted")}')
+        print(f'Recall: {recall_score(y_true, y_pred, average="weighted")}')
+        print(f'F1-score: {f1_score(y_true, y_pred, average="weighted")}')
+        print('##################################\n')
+        
+        return precision_score(y_true, y_pred, average='weighted'), recall_score(y_true, y_pred, average='weighted'), f1_score(y_true, y_pred, average='weighted')
 
-    print('##################################')
-    print(f'Best model: {best_model}')
-    print(f'Precision: {best_p}')
-    print(f'Recall: {best_r}')
-    print(f'F1-score: {best_f1}')
-    print('Averages:')
-    print(f'Precision: {avg_p / 6}')
-    print(f'Recall: {avg_r / 6}')
-    print(f'F1-score: {avg_f1 / 6}')
-    print('##################################\n')
-    
-    # Save the best model
-    save_best_model(n_shot, best_model, n_config)
+    else:
+        avg_p, avg_r, avg_f1, n_models = 0, 0, 0, 0
+        for m in os.listdir('../data/saved_models/0-shot'):
+            model_path = '../data/saved_models/0-shot' + f'/{m}'
+            model = YOLO(model_path)
+        
+            y_true, y_pred = np.array([]), np.array([])
+            for type in ('positive', 'negative'):
+
+                results = model(f'../data/ijmond/n-shot/{n_shot}/test/{type}/', verbose=False)
+                for result in results:
+                    
+                    if type == 'positive':
+                        y_true = np.append(y_true, 1)
+                    else:
+                        y_true = np.append(y_true, 0)
+                    y_pred = np.append(y_pred, result.probs.top1)
+                    
+            avg_p += precision_score(y_true, y_pred, average="weighted")
+            avg_r += recall_score(y_true, y_pred, average="weighted")
+            avg_f1 += f1_score(y_true, y_pred, average="weighted")
+            n_models += 1
+
+            print('##################################')
+            print(f'Precision: {precision_score(y_true, y_pred, average="weighted")}')
+            print(f'Recall: {recall_score(y_true, y_pred, average="weighted")}')
+            print(f'F1-score: {f1_score(y_true, y_pred, average="weighted")}')
+            print('##################################\n')
+            
+        print('##################################')
+        print('AVERAGES')
+        print(f'Precision: {avg_p / n_models}')
+        print(f'Recall: {avg_r / n_models}')
+        print(f'F1-score: {avg_f1 / n_models}')
+        print('##################################\n')
 
 
-def remove_folders(n_shot):
+def remove_folders(n_shot):    
     shutil.rmtree('runs/classify/')
     shutil.rmtree(f'../data/ijmond/n-shot/{n_shot}')
+    
+    
+def save_results(n_shot, i):
+    dir_path = f'../data/saved_results/{n_shot}/c{i}'
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    
+    SAVE_PATH = f'../data/saved_results/{n_shot}/c{i}/results.csv'
+    shutil.copy('runs/classify/train/results.csv', SAVE_PATH)
 
 
 def main(argv):
     if len(argv) < 2:
-        print("Usage: python run_experiments.py [0-shot/1-shot/3-shot/6-shot/9-shot]")
+        print("Usage: python3 experiments.py [0-shot/1-shot/3-shot/6-shot/9-shot]")
         return
     n_shot = argv[1]
     if n_shot not in ('0-shot', '1-shot', '3-shot', '6-shot', '9-shot'):
-        print("Usage: python run_experiments.py [0-shot/1-shot/3-shot/6-shot/9-shot]")
+        print("Usage: python3 experiments.py [0-shot/1-shot/3-shot/6-shot/9-shot]")
         return
 
-    # Create config file for n-shot
-    n_configs = 5    
-    create_config_file(n_shot, n_configs)
-    
-    for i in range(n_configs):
-        
-        print(f'Starting config {i}')
-        
-        # Create temp n-shot dir
-        create_dir(i, n_shot)
-        print('Finished creating directories.')
-
-        # Train all models
-        train_models(n_shot)
-        print('Finished training all models.')
-        
-        # Test models and save best
+    if n_shot == '0-shot':
+        # Test the model
         print(f'Starting testing')
-        test_models(n_shot, i)
+        test_models(n_shot)
+
+    else:
+        # Create config file for n-shot
+        n_configs = 5    
+        create_config_file(n_shot, n_configs)
         
-        # Remove other folders
-        remove_folders(n_shot)
-        print('Finished removing folders\n\n\n\n')
+        avg_p, avg_r, avg_f1 = 0, 0, 0
+        for i in range(n_configs):
             
+            print(f'Starting config {i}')
+            
+            # Create temp n-shot dir
+            create_dir(i, n_shot)
+            print('Finished creating directories.')
+
+            # Train the model on all IJMD splits
+            train_models(n_shot)
+            print('Finished training all models.')
+            
+            # Test and save best
+            print(f'Starting testing')
+            p, r, f1 = test_models(n_shot, i)
+            
+            avg_p += p
+            avg_r += r
+            avg_f1 += f1
+            
+            # Save loss and lr
+            save_results(n_shot, i)
+            
+            # Remove other folders
+            remove_folders(n_shot, i)
+            print('Finished removing folders\n\n\n\n')
+        
+        # Print averages
+        print('##################################')
+        print('AVERAGES')
+        print(f'Precision: {avg_p / n_configs}')
+        print(f'Recall: {avg_r / n_configs}')
+        print(f'F1-score: {avg_f1 / n_configs}')
+        print('##################################\n')
 
 if __name__ == "__main__":
     main(sys.argv)

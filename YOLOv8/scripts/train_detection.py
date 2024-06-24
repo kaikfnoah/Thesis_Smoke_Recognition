@@ -14,11 +14,11 @@ def save_model(name, model_path):
 
 def main(argv):
     if len(argv) < 2:
-        print("Usage: python train_detection.py [ijmond/rise]")
+        print("Usage: python3 train_detection.py [ijmond/rise]")
         return
     name = argv[1]
     if name not in ('ijmond', 'rise'):
-        print("Usage: python train_detection.py [ijmond/rise]")
+        print("Usage: python3 train_detection.py [ijmond/rise]")
         return
     
     model_path = '../data/pre_trained_models/yolov8x.pt'

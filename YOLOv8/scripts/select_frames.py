@@ -23,11 +23,11 @@ def conf_score_frame(model, frame):
 
 def main(argvs):
     if len(argvs) < 2:
-        print("Usage: python select_frames.py [ijmond/rise]")
+        print("Usage: python3 select_frames.py [ijmond/rise]")
         return
     name = argvs[1]
     if name not in ('ijmond', 'rise'):
-        print("Usage: python select_frames.py [ijmond/rise]")
+        print("Usage: python3 select_frames.py [ijmond/rise]")
         return
     
     model_path = f'../data/saved_models/detection_{name}.pt'

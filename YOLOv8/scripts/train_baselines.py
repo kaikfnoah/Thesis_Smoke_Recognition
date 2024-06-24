@@ -3,12 +3,12 @@ import shutil
 from ultralytics import YOLO
 
 def save_model(n_shot, model_path, n_config):
-    dir_path = f'../data/saved_models/{n_shot}'
+    dir_path = f'../data/saved_models/{n_shot}_test'
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
     
     # Save to folder
-    SAVE_PATH = f'../data/saved_models/{n_shot}/best.pt'
+    SAVE_PATH = f'../data/saved_models/{n_shot}_test/best.pt'
     shutil.copy(model_path, SAVE_PATH)
     
     # Rename 
@@ -33,7 +33,7 @@ def main():
                     weight_decay=0.001,
                     single_cls=True,
                     dropout=0.5,
-                    # device=[0, 1],
+                    device=[0, 1],
                     seed=0)
 
         if split == 'by_date':
