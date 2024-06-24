@@ -31,16 +31,7 @@ def create_yolo_struture(data, type, name, YOLO_DIR):
 
 
 def main(argvs):
-    if len(argvs) < 2:
-        print("Usage: python create_splits.py [ijmond/rise]")
-        return
-    name = argvs[1]
-    if name not in ('ijmond', 'rise'):
-        print("Usage: python create_splits.py [ijmond/rise]")
-        return
-    
-    name = argvs[1]
-    SPLITS_DIR = f'../data/{name}/splits_yolo'
+    SPLITS_DIR = f'../data/rise/splits_yolo'
     
     if not os.path.exists(SPLITS_DIR):
         os.mkdir(SPLITS_DIR)
@@ -57,11 +48,11 @@ def main(argvs):
         for type in ('train', 'test', 'validation'):
         
             # Load data
-            with open(f'../data/{name}/splits/metadata_{type}_split_{split}.json') as f:
+            with open(f'../data/rise/splits/metadata_{type}_split_{split}.json') as f:
                 data = json.load(f)
             
             # Run yolo data structure creation
-            create_yolo_struture(data, type, name, YOLO_DIR)
+            create_yolo_struture(data, type, 'rise', YOLO_DIR)
             print(f'#### FINISHED {type}')
             
 
