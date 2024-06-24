@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import shutil
 
@@ -30,7 +29,7 @@ def create_yolo_struture(data, type, name, YOLO_DIR):
             shutil.copy(source_file, SAVE_PATH)
 
 
-def main(argvs):
+def main():
     SPLITS_DIR = f'../data/rise/splits_yolo'
     
     if not os.path.exists(SPLITS_DIR):
@@ -57,4 +56,4 @@ def main(argvs):
             
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()
