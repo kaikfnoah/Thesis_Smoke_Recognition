@@ -1,6 +1,10 @@
-# YOLO Docs
+# Using YOLO
 
-insert image here
+This image represents the pipeline that was used in this research. We refer to the paper to get a better understanding of the exect workings. 
+
+<p align='center'>
+  <img src="readme_image.png" alt="Pipeline used in this research." width="800"/>
+</p>
 
 ## 1.1 Train Detection Model
 To train the detection model, used for creating the image datasets from the video datasets, take the following steps:
@@ -43,4 +47,6 @@ To train the six YOLO baseline models, simply run ```python3 train_baselines.py`
 ## 1.4 Run Experiments
 Now that everything is setup, we can run the experiments on the IJmond data for each learning technique. As stated in the paper, for each learning technique, we also create five unique data splits. This is done in a same way as in 1.3.1, but the folders are automatically created and removed again. Simply run ```python3 experiments.py [0-shot/1-shot/3-shot/6-shot/9-shot]``` to fine-tune the six baselines on the specified n-shot setup (when you enter 0-shot there will be no finetuning, but only testing).
 
-# RGB-I3D Docs
+# Using RGB-I3D
+
+For using the RGB-I3D model, we refer to the steps defined in [Project RISE](https://github.com/CMU-CREATE-Lab/deep-smoke-machine). However, in this repository we have made a slight adjustment to the i3d_learner file. Therefore, when running code for IJmond the ```i3d_learner_ijmond.py``` file is used. 
