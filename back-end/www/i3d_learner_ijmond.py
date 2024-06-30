@@ -33,6 +33,7 @@ import torch.multiprocessing as mp
 from torch.utils.data.distributed import DistributedSampler
 import shutil
 from model.tsm.ops.models import TSN
+import time
 
 
 # Two-Stream Inflated 3D ConvNet learner
@@ -545,6 +546,7 @@ class I3dLearner(BaseLearner):
                 transform, self.batch_size_test, self.can_parallel)
 
         # Test
+        start = time.time()
         model.train(False) # set the model to evaluation mode
         file_name = []
         true_labels = []
@@ -568,6 +570,8 @@ class I3dLearner(BaseLearner):
                 pred = pred.cpu().detach()
                 pred_labels += self.labels_to_list(pred)
                 pred_scores += self.labels_to_score_list(pred)
+        end = time.time()
+        print(end - start)
 
         # Sync true_labels and pred_labels for testing set
         true_labels_all = np.array(true_labels)
@@ -589,28 +593,27 @@ class I3dLearner(BaseLearner):
         self.log("Evaluate performance of phase: test\n%s" % (cr(true_labels_all, pred_labels_all)))
 
         # Save roc curve and score
-        self.log("roc_auc_score: %s" % str(roc_auc_score(true_scores_all, pred_scores_all, average=None)))
+        # self.log("roc_auc_score: %s" % str(roc_auc_score(true_scores_all, pred_scores_all, average=None)))
 
         # Generate video summary and show class activation map
         # TODO: this part will cause an error when using multiple GPUs
-        try:
-            # Video summary
-            cm = confusion_matrix_of_samples(true_labels, pred_labels, n=64)
-            write_video_summary(cm, file_name, p_frame, save_viz_path + str(rank) + "/")
-            # Save confusion matrix
-            cm_all = confusion_matrix_of_samples(true_labels, pred_labels)
-            for u in cm_all:
-                for v in cm_all[u]:
-                    for i in range(len(cm_all[u][v])):
-                        idx = cm_all[u][v][i]
-                        cm_all[u][v][i] = file_name[idx]
-            save_json(cm_all, save_viz_path + str(rank) + "/confusion_matrix_of_samples.json")
-        except Exception as ex:
-            self.log(ex)
+        # try:
+        #     # Video summary
+        #     cm = confusion_matrix_of_samples(true_labels, pred_labels, n=64)
+        #     write_video_summary(cm, file_name, p_frame, save_viz_path + str(rank) + "/")
+        #     # Save confusion matrix
+        #     cm_all = confusion_matrix_of_samples(true_labels, pred_labels)
+        #     for u in cm_all:
+        #         for v in cm_all[u]:
+        #             for i in range(len(cm_all[u][v])):
+        #                 idx = cm_all[u][v][i]
+        #                 cm_all[u][v][i] = file_name[idx]
+        #     save_json(cm_all, save_viz_path + str(rank) + "/confusion_matrix_of_samples.json")
+        # except Exception as ex:
+        #     self.log(ex)
 
         # Clean processors
         self.clean_mp()
-
         self.log("Done testing")
 
     def extract_features(self,
