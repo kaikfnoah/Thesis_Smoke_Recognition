@@ -11,7 +11,7 @@ google_signin_client_id
 db_url*
 schema.sql
 *screenlog*
-**/data/*
+# **/data/*
 !**/data/pretrained_models/
 !**/data/dataset/
 !**/data/production_url_list/
@@ -23,3 +23,23 @@ dl2023_gpu.yml
 datasets/
 yolo_OSL/
 YOLOv8/scripts/runs
+**/data/ijmond/annotated
+**/data/ijmond/frames
+**/data/ijmond/setups
+**/data/ijmond/videos
+**/data/ijmond/n-shot
+**/data/rise/annotated
+**/data/rise/frames
+**/data/rise/setups
+**/data/rise/videos
+**/data/rise/n-shot
+**/data/rise/splits_yolo
+**/data/videos
+**/data/rgb
+**/data/saved_i3d
+**/data/i3d_features_rgb
+**/data/paper_result
+**/data/pre_trained_models
+**/data/saved_models
+**/data/saved_results
+back-end/data
